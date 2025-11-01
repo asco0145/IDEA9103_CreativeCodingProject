@@ -21,12 +21,14 @@ function setup() {
 
   hillsMask.resize(width, height); //Trying to resize mask 
 
-  image(baseImg, 0, 0)
+  //image(baseImg, 0, 0);
 }
 
 function draw() {
   //background(220);
-  hills.drawLines();
+
+
+  hills.drawPoints();
   
   
 }
@@ -43,7 +45,7 @@ class WaterArea {
 class HillsArea {
  constructor(maskImg){this.mask = maskImg;}
 
-  drawLines() {
+  /*drawLines() {
     //Draws 5 lines
     for (let i = 0; i < 5; i++){
       let x1 = random(width);
@@ -71,6 +73,30 @@ class HillsArea {
       line(x1, y1, x2, y2);
     }
 
+  }*/
+
+  drawPoints(){
+    for (let i = 0; i < 250; i++){
+      let x = random(width);
+      let y = random(height);
+
+      //Black and White Mask
+      let m = this.mask.get(int(x), int(y));
+      let bright = (m[0] + m[1] + m[2]) /3;
+      
+      if (bright < 100) continue;
+
+      //Choses color for the painting
+      let c = baseImg.get(int(x), int(y));
+
+      let size = map((c[0] + c[1] + c[2])/3, 0, 255, 2, 6) //size depends on color
+
+      //Dot details
+      strokeWeight(size);
+      stroke(c[0], c[1], c[2], 180);
+      point(x, y);
+
+    }
   }
 }
 
