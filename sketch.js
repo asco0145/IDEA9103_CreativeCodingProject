@@ -6,7 +6,7 @@ function preload(){
   guyMask = loadImage("assets/guy.png")
   skyMask = loadImage("assets/sky.png")
   waterMask = loadImage("assets/water.png")
-  hillsMask = loadImage("assets/hills.png")
+  hillsMask = loadImage("assets/bwhills.png")
   bridgeMask = loadImage("assets/bridge.png")
 
   sky = new SkyArea(skyMask);
@@ -19,12 +19,15 @@ function preload(){
 function setup() {
   createCanvas(baseImg.width, baseImg.height);
 
+  hillsMask.resize(width, height); //Trying to resize mask 
+
   image(baseImg, 0, 0)
 }
 
 function draw() {
-  background(220);
-
+  //background(220);
+  hills.drawLines();
+  
   
 }
 
@@ -36,8 +39,39 @@ class WaterArea {
   
 }
 
+//Alex
 class HillsArea {
- 
+ constructor(maskImg){this.mask = maskImg;}
+
+  drawLines() {
+    //Draws 5 lines
+    for (let i = 0; i < 5; i++){
+      let x1 = random(width);
+      let y1 = random(height);
+      let x2 = random(width);
+      let y2 = random(height);
+      
+
+      //Check Point 1
+      let p1 = this.mask.get(int(x1), int(y1));
+      let b1 = (p1[0] + p1[1] + p1[2]) /3; //greyscale
+
+      //Check Point 2
+      let p2 = this.mask.get(int(x2), int(y2));
+      let b2 = (p2[0] + p2[1] + p2[2]) /3; //greyscale
+
+      if(b1 < 200 || b2 < 200) continue; //avoid drawing in the black
+      
+      
+      //Choses color for the painting
+      let c = baseImg.get(int(x1), int(y1));
+
+      strokeWeight(4);
+      stroke(c[0], c[1], c[2], 180);
+      line(x1, y1, x2, y2);
+    }
+
+  }
 }
 
 class BridgeArea {
