@@ -45,9 +45,6 @@ class BridgeArea {
 }
 
 class GuyArea {
-<<<<<<< Updated upstream
-  
-=======
   constructor(maskImg) {
     this.mask = maskImg;          // store the mask
     this.numSegments = 50;        // same as your Mona example
@@ -95,5 +92,4 @@ class GuyArea {
       segment.draw();
     }
   }
->>>>>>> Stashed changes
 }
