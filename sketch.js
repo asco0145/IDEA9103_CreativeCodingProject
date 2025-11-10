@@ -10,11 +10,11 @@ guyMask = loadImage("assets/guy.png")
 
 skyMask = loadImage("assets/sky.png")
 
-waterMask = loadImage("assets/water.png")
+waterMask = loadImage("assets/bwWater.png")
 
 hillsMask = loadImage("assets/hills.png")
 
-bridgeMask = loadImage("assets/bwbridge.png")
+bridgeMask = loadImage("assets/bwBridge.png")
 
 sky = new SkyArea(skyMask);
 
