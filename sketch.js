@@ -45,5 +45,55 @@ class BridgeArea {
 }
 
 class GuyArea {
+<<<<<<< Updated upstream
   
+=======
+  constructor(maskImg) {
+    this.mask = maskImg;          // store the mask
+    this.numSegments = 50;        // same as your Mona example
+    this.segments = [];           // will hold ImageSegment objects
+
+    this.buildSegments();         // create the mosaic once
+  }
+
+  buildSegments() {
+    let segmentWidth = width / this.numSegments;
+    let segmentHeight = height / this.numSegments;
+
+    for (let segYPos = 0; segYPos < height; segYPos += segmentHeight) {
+      for (let segXPos = 0; segXPos < width; segXPos += segmentWidth) {
+
+        // sample from the centre of the segment
+        let sx = int(segXPos + segmentWidth / 2);
+        let sy = int(segYPos + segmentHeight / 2);
+
+        // safety so we don't go out of bounds
+        sx = constrain(sx, 0, width - 1);
+        sy = constrain(sy, 0, height - 1);
+
+        // check the mask first – only draw where the guy is
+        let m = this.mask.get(sx, sy);
+        if (!m) continue;
+
+        let bright = (m[0] + m[1] + m[2]) / 3;
+
+        // if your guy mask is white on black, this avoids the black background
+        if (bright < 100) continue;
+
+        // get colour from the base image at the same spot
+        let segmentColour = baseImg.get(sx, sy);
+
+        // create a segment and store it
+        let segment = new ImageSegment(segXPos, segYPos, segmentWidth, segmentHeight, segmentColour);
+        this.segments.push(segment);
+      }
+    }
+  }
+
+  drawSegments() {
+    for (const segment of this.segments) {
+      segment.draw();
+    }
+  }
+>>>>>>> Stashed changes
 }
