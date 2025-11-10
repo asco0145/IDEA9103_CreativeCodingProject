@@ -1,50 +1,43 @@
 let baseImg, skyMask, waterMask, hillsMask, bridgeMask, guyMask;
 let sky, water, hills, bridge, guy;
 
-function preload(){
-  baseImg = loadImage("assets/scream.jpeg")
-  guyMask = loadImage("assets/guy.png")
-  skyMask = loadImage("assets/sky.png")
-  waterMask = loadImage("assets/water.png")
-  hillsMask = loadImage("assets/hills.png")
-  bridgeMask = loadImage("assets/bridge.png")
-
-  sky = new SkyArea(skyMask);
-  water = new WaterArea(waterMask);
-  hills = new HillsArea(hillsMask);
-  bridge = new BridgeArea(bridgeMask);
-  guy = new GuyArea(guyMask);
+function preload() {
+  baseImg   = loadImage("assets/scream.jpeg");
+  guyMask   = loadImage("assets/guy.png");  
+  skyMask   = loadImage("assets/sky.png");
+  waterMask = loadImage("assets/water.png");
+  hillsMask = loadImage("assets/hills.png");
+  bridgeMask = loadImage("assets/bridge.png");
 }
 
 function setup() {
   createCanvas(baseImg.width, baseImg.height);
 
-  image(baseImg, 0, 0)
+  sky    = new SkyArea(skyMask);
+  water  = new WaterArea(waterMask);
+  hills  = new HillsArea(hillsMask);
+  bridge = new BridgeArea(bridgeMask);
+  guy    = new GuyArea(guyMask, baseImg);
 }
 
 function draw() {
   background(220);
 
-  
+  image(baseImg, 0, 0);
+
+  guy.draw();
 }
 
-class SkyArea {
-  
-}
 
-class WaterArea {
   
-}
+class SkyArea {}
+class WaterArea {}
+class HillsArea {}
+class BridgeArea {}
 
-class HillsArea {
- 
-}
-
-class BridgeArea {
-  
-}
 
 class GuyArea {
+<<<<<<< Updated upstream
   constructor(maskImg) {
     this.mask = maskImg;          // store the mask
     this.numSegments = 50;        // same as your Mona example
@@ -93,3 +86,54 @@ class GuyArea {
     }
   }
 }
+=======
+  constructor(guyImg, baseImg) {
+    this.guyImg = guyImg;
+    this.baseImg = baseImg;
+
+    this.numSegments = 40; // grid density (smaller = chunkier pixels)
+    this.segW = this.guyImg.width / this.numSegments;
+    this.segH = this.guyImg.height / this.numSegments;
+
+    this.segments = [];
+
+    // Divide guy.png into segments where alpha > 0
+    for (let y = 0; y < this.guyImg.height; y += this.segH) {
+      for (let x = 0; x < this.guyImg.width; x += this.segW) {
+        const cx = Math.floor(x + this.segW / 2);
+        const cy = Math.floor(y + this.segH / 2);
+
+        const col = this.guyImg.get(cx, cy);
+        const alpha = col[3];
+
+        // skip fully transparent pixels
+        if (alpha === 0) continue;
+
+        this.segments.push({
+          x, y, w: this.segW, h: this.segH, colour: col
+        });
+      }
+    }
+
+    console.log("Guy segments created:", this.segments.length);
+  }
+
+  draw() {
+    image(this.guyImg, 0, 0);
+
+    noStroke();
+
+    for (const seg of this.segments) {
+      const { x, y, w, h, colour } = seg;
+
+      const over =
+        mouseX > x && mouseX < x + w &&
+        mouseY > y && mouseY < y + h;
+
+      if (over) continue; 
+
+      rect(x, y, w, h);
+    }
+  }
+}
+>>>>>>> Stashed changes
