@@ -6,7 +6,7 @@ function preload(){
 
 baseImg = loadImage("assets/scream.jpeg")
 
-guyMask = loadImage("assets/guy.png")
+guyMask = loadImage("assets/bwguy.png")
 
 skyMask = loadImage("assets/sky.png")
 
@@ -38,7 +38,7 @@ waterMask.resize(width, height);
 bridgeMask.resize(width, height);
 
 skyMask.resize(width, height);
-
+guyMask.resize(width, height);
 
 //image(baseImg, 0, 0);
 
@@ -53,7 +53,7 @@ hills.drawPoints();
 water.drawPoints();
 bridge.drawPoints();
 sky.drawStrokes();
-
+guy.drawPixels();
 }
 
 class SkyArea {
@@ -250,5 +250,32 @@ class BridgeArea {
 }
 
 class GuyArea {
+constructor(maskImg) {
+    this.mask = maskImg;
+    this.pixelSize = 6;       // try 6–10 to see it clearly first
+    this.pixelsPerFrame = 100; // how fast he appears
+  }
 
+  drawPixels() {
+    for (let i = 0; i < this.pixelsPerFrame; i++) {
+      // pick a random position snapped to the pixel grid
+      let x = floor(random(width / this.pixelSize)) * this.pixelSize;
+      let y = floor(random(height / this.pixelSize)) * this.pixelSize;
+
+      // look up the mask at that position
+      let m = this.mask.get(x, y);
+      let bright = (m[0] + m[1] + m[2]) / 3;
+
+      // only draw where the mask is WHITE (inside the guy)
+      if (bright < 100) continue;
+
+      // sample colour from the base image
+      let c = baseImg.get(x, y);
+
+      noStroke();
+      // alpha controls softness of fade-in
+      fill(c[0], c[1], c[2], 120);
+      rect(x, y, this.pixelSize, this.pixelSize);
+    }
+  }
 }
