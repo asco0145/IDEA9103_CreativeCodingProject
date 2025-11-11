@@ -40,6 +40,8 @@ bridgeMask.resize(width, height);
 skyMask.resize(width, height);
 guyMask.resize(width, height);
 
+=======
+>>>>>>> Stashed changes
 //image(baseImg, 0, 0);
 
 }
@@ -52,7 +54,12 @@ hills.drawPoints();
 
 water.drawPoints();
 bridge.drawPoints();
+<<<<<<< Updated upstream
 sky.drawStrokes();
+=======
+
+//draw the pixelated guy last (so he sits on top)
+>>>>>>> Stashed changes
 guy.drawPixels();
 }
 
@@ -250,6 +257,7 @@ class BridgeArea {
 }
 
 class GuyArea {
+<<<<<<< Updated upstream
 constructor(maskImg) {
     this.mask = maskImg;
     this.pixelSize = 6;       // try 6–10 to see it clearly first
@@ -279,3 +287,6 @@ constructor(maskImg) {
     }
   }
 }
+=======
+
+>>>>>>> Stashed changes
