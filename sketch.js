@@ -44,6 +44,11 @@ drawStrokes() {
     let offset = sin(radians(frameCount * 2 + y * 3)) * 10; // horizontal left right movement
 
     for (let x = 0; x < width; x += 12) { //each iteration draws one short stroke, 10 pixels wide, along the row
+         // check if pixel belongs to sky (based on mask brightness)
+        let m = this.mask.get(x, y);
+        let bright = (m[0] + m[1] + m[2]) / 3;
+
+        if (bright > 40) {  // only draw strokes where mask is bright (sky area)
       let c = baseImg.get(x, y); //use colours from base image
       stroke(c[0], c[1], c[2], 200);
       strokeWeight(3); // make each line 3 pixels thick
@@ -55,4 +60,4 @@ drawStrokes() {
   }
 }
 }
-
+}
