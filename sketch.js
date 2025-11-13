@@ -1,247 +1,171 @@
 let baseImg, skyMask, waterMask, hillsMask, bridgeMask, guyMask;
-
 let sky, water, hills, bridge, guy;
 
-function preload(){
+let song;          // the sound file
+let amp;           // amplitude analyzer
+let button;        // play/pause button
 
-baseImg = loadImage("assets/scream.jpeg")
+function preload() {
+  // images
+  baseImg   = loadImage("assets/scream.jpeg");
+  guyMask   = loadImage("assets/bwguy.png");
+  skyMask   = loadImage("assets/sky.png");
+  waterMask = loadImage("assets/bwWater.png");
+  hillsMask = loadImage("assets/hills.png");
+  bridgeMask= loadImage("assets/bwBridge.png");
 
-guyMask = loadImage("assets/bwguy.png")
+  // audio
+  song = loadSound("assets/Miserere mei, Deus.mp3");
 
-skyMask = loadImage("assets/sky.png")
-
-waterMask = loadImage("assets/bwWater.png")
-
-hillsMask = loadImage("assets/hills.png")
-
-bridgeMask = loadImage("assets/bwBridge.png")
-
-sky = new SkyArea(skyMask);
-
-water = new WaterArea(waterMask);
-
-hills = new HillsArea(hillsMask);
-
-bridge = new BridgeArea(bridgeMask);
-
-guy = new GuyArea(guyMask);
-
+  // create area objects
+  sky    = new SkyArea(skyMask);
+  water  = new WaterArea(waterMask);
+  hills  = new HillsArea(hillsMask);
+  bridge = new BridgeArea(bridgeMask);
+  guy    = new GuyArea(guyMask);
 }
 
 function setup() {
+  createCanvas(baseImg.width, baseImg.height);
 
-createCanvas(baseImg.width, baseImg.height);
+  hillsMask.resize(width, height);
+  waterMask.resize(width, height);
+  bridgeMask.resize(width, height);
+  skyMask.resize(width, height);
+  guyMask.resize(width, height);
 
-hillsMask.resize(width, height); //Trying to resize mask
+  // set up amplitude analyzer
+  amp = new p5.Amplitude();
+  amp.setInput(song);
 
-waterMask.resize(width, height);
-bridgeMask.resize(width, height);
-
-skyMask.resize(width, height);
-guyMask.resize(width, height);
-
-//image(baseImg, 0, 0);
-
+  button = createButton("Play / Pause");
+  button.position(10, 10);
+  button.mousePressed(toggleSong);
 }
 
 function draw() {
+  // optional background if you want to clear each frame
+  // background(0);
 
-//background(220);
+  // current loudness level (0 → ~0.3)
+  let level = amp.getLevel();
 
-hills.drawPoints();
+  let levelNorm = map(level, 0, 0.3, 0, 1);  
+  levelNorm = constrain(levelNorm, 0, 1);
 
-water.drawPoints();
-bridge.drawPoints();
+  // ----------------- painting layers -----------------
+  hills.drawPoints();
+  water.drawPoints();
+  bridge.drawPoints();
+  sky.drawStrokes();
 
-sky.drawStrokes();
+  //csound controls guy
+  guy.drawPixels(levelNorm);
 
-
-//draw the pixelated guy last (so he sits on top)
-
-guy.drawPixels();
+  noStroke();
+  fill(255, 255, 255, 120);
+  let eSize = map(level, 0, 0.3, 10, 120);
+  ellipse(width - 80, height - 80, eSize);
 }
+
+// button callback
+function toggleSong() {
+  if (song.isPlaying()) {
+    song.pause();
+  } else {
+    song.loop();  // loop so the animation keeps going
+  }
+}
+
+// ----------------- CLASSES -----------------
 
 class SkyArea {
   constructor(maskImg){
     this.mask = maskImg;
-
   }
-drawStrokes() {
-  for (let y = 0; y < height; y += 6) { //loops through the y axis of the canvas in steps of 6 pixels
 
-    let offset = sin(radians(frameCount * 2 + y * 3)) * 10; // horizontal left right movement
+  drawStrokes() {
+    for (let y = 0; y < height; y += 6) {
+      let offset = sin(radians(frameCount * 2 + y * 3)) * 10;
 
-    for (let x = 0; x < width; x += 12) { //each iteration draws one short stroke, 10 pixels wide, along the row
-         // check if pixel belongs to sky (based on mask brightness)
+      for (let x = 0; x < width; x += 12) {
         let m = this.mask.get(x, y);
         let bright = (m[0] + m[1] + m[2]) / 3;
 
-        if (bright > 40) {  // only draw strokes where mask is bright (sky area)
-      let c = baseImg.get(x, y); //use colours from base image
-      stroke(c[0], c[1], c[2], 200);
-      strokeWeight(3); // make each line 3 pixels thick
+        if (bright > 40) {
+          let c = baseImg.get(x, y);
+          stroke(c[0], c[1], c[2], 200);
+          strokeWeight(3);
 
-      // wave movement per pixel
-      let yShift = sin((x * 0.5) + (frameCount * 0.005)) * 3; //vertical wave motion
-      line(x + offset, y + yShift, x + 10 + offset, y + yShift); // horizontal line
+          let yShift = sin((x * 0.5) + (frameCount * 0.005)) * 3;
+          line(x + offset, y + yShift, x + 10 + offset, y + yShift);
+        }
+      }
     }
-  }}}
+  }
 }
-
-  
 
 class WaterArea {
+  constructor(maskImg){ this.mask = maskImg; }
 
-constructor(maskImg){this.mask = maskImg;}
+  drawPoints(){
+    for (let i = 0; i < 250; i++){
+      let x = random(width);
+      let y = random(height);
 
-drawPoints(){
+      let m = this.mask.get(int(x), int(y));
+      let bright = (m[0] + m[1] + m[2]) /3;
+      if (bright < 100) continue;
 
-for (let i = 0; i < 250; i++){
+      let c = baseImg.get(int(x), int(y));
+      let size = map((c[0] + c[1] + c[2])/3, 0, 255, 2, 6);
 
-let x = random(width);
-
-let y = random(height);
-
-//Black and White Mask
-
-let m = this.mask.get(int(x), int(y));
-
-let bright = (m[0] + m[1] + m[2]) /3;
-
-if (bright < 100) continue;
-
-//Chooses color for the painting
-
-let c = baseImg.get(int(x), int(y));
-
-let size = map((c[0] + c[1] + c[2])/3, 0, 255, 2, 6) //size depends on color
-
-//Dot details
-
-strokeWeight(size);
-
-stroke(c[0], c[1], c[2], 180);
-
-point(x, y);
-
+      strokeWeight(size);
+      stroke(c[0], c[1], c[2], 180);
+      point(x, y);
+    }
+  }
 }
-
-}
-
-}
-
-//Alex
 
 class HillsArea {
+  constructor(maskImg){ this.mask = maskImg; }
 
-constructor(maskImg){this.mask = maskImg;}
+  drawPoints(){
+    for (let i = 0; i < 250; i++){
+      let x = random(width);
+      let y = random(height);
 
-/*drawLines() {
+      let m = this.mask.get(int(x), int(y));
+      let bright = (m[0] + m[1] + m[2]) /3;
+      if (bright < 100) continue;
 
-//Draws 5 lines
+      let c = baseImg.get(int(x), int(y));
+      let size = map((c[0] + c[1] + c[2])/3, 0, 255, 2, 6);
 
-for (let i = 0; i < 5; i++){
-
-let x1 = random(width);
-
-let y1 = random(height);
-
-let x2 = random(width);
-
-let y2 = random(height);
-
-//Check Point 1
-
-let p1 = this.mask.get(int(x1), int(y1));
-
-let b1 = (p1[0] + p1[1] + p1[2]) /3; //greyscale
-
-//Check Point 2
-
-let p2 = this.mask.get(int(x2), int(y2));
-
-let b2 = (p2[0] + p2[1] + p2[2]) /3; //greyscale
-
-if(b1 < 200 || b2 < 200) continue; //avoid drawing in the black
-
-//Choses color for the painting
-
-let c = baseImg.get(int(x1), int(y1));
-
-strokeWeight(4);
-
-stroke(c[0], c[1], c[2], 180);
-
-line(x1, y1, x2, y2);
-
-}
-
-}*/
-
-drawPoints(){
-
-for (let i = 0; i < 250; i++){
-
-let x = random(width);
-
-let y = random(height);
-
-//Black and White Mask
-
-let m = this.mask.get(int(x), int(y));
-
-let bright = (m[0] + m[1] + m[2]) /3;
-
-if (bright < 100) continue;
-
-//Choses color for the painting
-
-let c = baseImg.get(int(x), int(y));
-
-let size = map((c[0] + c[1] + c[2])/3, 0, 255, 2, 6) //size depends on color
-
-//Dot details
-
-strokeWeight(size);
-
-stroke(c[0], c[1], c[2], 180);
-
-point(x, y);
-
-}
-
-}
-
+      strokeWeight(size);
+      stroke(c[0], c[1], c[2], 180);
+      point(x, y);
+    }
+  }
 }
 
 class BridgeArea {
   constructor(maskImg) {
-    // stores the black & white mask for the bridge
     this.mask = maskImg;
   }
 
   drawPoints() {
-    // each frame, randomly place small dots within the bridge area
     for (let i = 0; i < 250; i++) {
-
-      // pick a random position
       let x = random(width);
       let y = random(height);
 
-      // check brightness in the bridge mask at that position
       let m = this.mask.get(int(x), int(y));
       let bright = (m[0] + m[1] + m[2]) / 3;
-
-      // only draw on white parts of the mask (the bridge)
       if (bright < 120) continue;
 
-      // grab the corresponding color from the original painting
       let c = baseImg.get(int(x), int(y));
-
-      // map color brightness to dot size (dark = small, light = big)
       let size = map((c[0] + c[1] + c[2]) / 3, 0, 255, 2, 5);
 
-      // draw the colored dot with some transparency
       strokeWeight(size);
       stroke(c[0], c[1], c[2], 170);
       point(x, y);
@@ -249,34 +173,33 @@ class BridgeArea {
   }
 }
 
-
+// 🔹 UPDATED: GuyArea now takes an amplitude value
 class GuyArea {
-constructor(maskImg) {
+  constructor(maskImg) {
     this.mask = maskImg;
-    this.pixelSize = 6;       // try 6–10 to see it clearly first
-    this.pixelsPerFrame = 100; // how fast he appears
+    this.basePixelSize = 6;     // starting size
+    this.pixelsPerFrame = 120;  // base speed
   }
 
-  drawPixels() {
-    for (let i = 0; i < this.pixelsPerFrame; i++) {
-      // pick a random position snapped to the pixel grid
-      let x = floor(random(width / this.pixelSize)) * this.pixelSize;
-      let y = floor(random(height / this.pixelSize)) * this.pixelSize;
+  // ampLevel is 0–1 from draw()
+  drawPixels(ampLevel) {
+    // make pixel size + speed respond to sound
+    let pixelSize = this.basePixelSize + ampLevel * 16;     // 6 → ~22
+    let count     = this.pixelsPerFrame + ampLevel * 300;   // faster when loud
 
-      // look up the mask at that position
+    for (let i = 0; i < count; i++) {
+      let x = floor(random(width / pixelSize)) * pixelSize;
+      let y = floor(random(height / pixelSize)) * pixelSize;
+
       let m = this.mask.get(x, y);
       let bright = (m[0] + m[1] + m[2]) / 3;
-
-      // only draw where the mask is WHITE (inside the guy)
       if (bright < 100) continue;
 
-      // sample colour from the base image
       let c = baseImg.get(x, y);
 
       noStroke();
-      // alpha controls softness of fade-in
-      fill(c[0], c[1], c[2], 120);
-      rect(x, y, this.pixelSize, this.pixelSize);
+      fill(c[0], c[1], c[2], 140);
+      rect(x, y, pixelSize, pixelSize);
     }
   }
 }
