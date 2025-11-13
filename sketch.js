@@ -40,7 +40,6 @@ bridgeMask.resize(width, height);
 skyMask.resize(width, height);
 guyMask.resize(width, height);
 
-
 //image(baseImg, 0, 0);
 
 }
@@ -58,8 +57,8 @@ sky.drawStrokes();
 
 
 //draw the pixelated guy last (so he sits on top)
-guy.drawPixels();
 
+guy.drawPixels();
 }
 
 class SkyArea {
@@ -217,48 +216,44 @@ point(x, y);
 
 class BridgeArea {
   constructor(maskImg) {
+    // stores the black & white mask for the bridge
     this.mask = maskImg;
   }
 
   drawPoints() {
+    // each frame, randomly place small dots within the bridge area
     for (let i = 0; i < 250; i++) {
+
+      // pick a random position
       let x = random(width);
       let y = random(height);
 
-      // Safety check: make sure we don't go out of bounds
-      x = constrain(int(x), 0, width - 1);
-      y = constrain(int(y), 0, height - 1);
-
-      // Get mask pixel
-      let m = this.mask.get(x, y);
-
-      // Safety check: skip if mask.get() returns undefined
-      if (!m) continue;
-
-      // Average brightness of the mask pixel
+      // check brightness in the bridge mask at that position
+      let m = this.mask.get(int(x), int(y));
       let bright = (m[0] + m[1] + m[2]) / 3;
 
-      // Include most of the bridge (low threshold)
-      if (bright < 20) continue;
+      // only draw on white parts of the mask (the bridge)
+      if (bright < 120) continue;
 
-      // Get color from base image
-      let c = baseImg.get(x, y);
+      // grab the corresponding color from the original painting
+      let c = baseImg.get(int(x), int(y));
 
-      // Map brightness to dot size
-      let size = map((c[0] + c[1] + c[2]) / 3, 0, 255, 2, 6);
+      // map color brightness to dot size (dark = small, light = big)
+      let size = map((c[0] + c[1] + c[2]) / 3, 0, 255, 2, 5);
 
-      // Draw the dot
+      // draw the colored dot with some transparency
       strokeWeight(size);
-      stroke(c[0], c[1], c[2], 180);
+      stroke(c[0], c[1], c[2], 170);
       point(x, y);
     }
   }
 }
 
+
 class GuyArea {
 constructor(maskImg) {
     this.mask = maskImg;
-    this.pixelSize = 6;    
+    this.pixelSize = 6;       // try 6–10 to see it clearly first
     this.pixelsPerFrame = 100; // how fast he appears
   }
 
@@ -285,4 +280,3 @@ constructor(maskImg) {
     }
   }
 }
-
