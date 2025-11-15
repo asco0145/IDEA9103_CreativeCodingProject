@@ -32,11 +32,9 @@ function setup() {
 
 createCanvas(baseImg.width, baseImg.height);
 
-hillsMask.resize(width, height); //Trying to resize mask
-
+hillsMask.resize(width, height);
 waterMask.resize(width, height);
 bridgeMask.resize(width, height);
-
 skyMask.resize(width, height);
 guyMask.resize(width, height);
 
@@ -88,8 +86,6 @@ drawStrokes() {
   }}}
 }
 
-  
-
 class WaterArea {
 
 constructor(maskImg){this.mask = maskImg;}
@@ -129,8 +125,6 @@ point(x, y);
 }
 
 }
-
-//Alex
 
 class HillsArea {
 
@@ -248,7 +242,6 @@ class BridgeArea {
     }
   }
 }
-
 
 class GuyArea {
 constructor(maskImg) {
