@@ -2,8 +2,13 @@ let baseImg, skyMask, waterMask, hillsMask, bridgeMask, guyMask;
 let sky, water, hills, bridge, guy;
 
 let song;          // the sound file
-let amp;           // amplitude analyzer
+let amp;           // amplitude analyzer (for guy)
+let fft;           // FFT object (for corner visualiser)
 let button;        // play/pause button
+
+// FFT settings (for the corner visualiser)
+let numBins = 128;
+let smoothing = 0.8;
 
 function preload() {
   // images
@@ -34,9 +39,13 @@ function setup() {
   skyMask.resize(width, height);
   guyMask.resize(width, height);
 
-  // set up amplitude analyzer
+  // set up amplitude analyzer (for guy)
   amp = new p5.Amplitude();
   amp.setInput(song);
+
+  // set up FFT (for corner visualiser)
+  fft = new p5.FFT(smoothing, numBins);
+  fft.setInput(song); // listen to the same song
 
   button = createButton("Play / Pause");
   button.position(10, 10);
@@ -49,7 +58,6 @@ function draw() {
 
   // current loudness level (0 → ~0.3)
   let level = amp.getLevel();
-
   let levelNorm = map(level, 0, 0.3, 0, 1);  
   levelNorm = constrain(levelNorm, 0, 1);
 
@@ -59,13 +67,17 @@ function draw() {
   bridge.drawPoints();
   sky.drawStrokes();
 
-  //csound controls guy
+  // sound controls guy
   guy.drawPixels(levelNorm);
 
-  noStroke();
-  fill(255, 255, 255, 120);
-  let eSize = map(level, 0, 0.3, 10, 120);
-  ellipse(width - 80, height - 80, eSize);
+  // ----------------- CORNER FFT VISUALISER -----------------
+  // (Part 5 style, but shrunk + moved into the corner)
+  let spectrum     = fft.analyze();
+  let amplitude    = fft.getEnergy(20, 20000);
+  let centroidFreq = fft.getCentroid();
+
+  // draw mini wheel in bottom-right corner
+  drawMiniVisualizer(width - 120, height - 120, 80, spectrum, amplitude, centroidFreq);
 }
 
 // button callback
@@ -75,6 +87,52 @@ function toggleSong() {
   } else {
     song.loop();  // loop so the animation keeps going
   }
+}
+
+// ------------- MINI FFT WHEEL (corner visualiser) -------------
+function drawMiniVisualizer(cx, cy, radius, spectrum, amplitude, centroidFreq) {
+  push();
+
+  // move to desired corner position
+  translate(cx, cy);
+
+  // use HSB just for the visualiser
+  colorMode(HSB, 255);
+  noStroke();
+
+  // we’ll treat radius as the inner circle radius of the bars
+  let circleRadius  = radius;
+  let maxRectLength = radius * 0.9;
+
+  // rectangles around the circle
+  for (let i = 0; i < spectrum.length; i++) {
+    // angle around circle
+    let angle = map(i, 0, spectrum.length, 0, TWO_PI);
+
+    // bar length based on spectrum value
+    let rectHeight = map(spectrum[i], 0, 255, 0, maxRectLength);
+
+    push();
+    rotate(angle);
+
+    // colour based on frequency band index
+    fill(map(i, 0, spectrum.length, 0, 255), 255, 255, 220);
+
+    // bar width so they fit nicely around circle
+    let rectWidth = (TWO_PI * circleRadius) / spectrum.length;
+    rect(0, circleRadius, rectWidth, rectHeight);
+    pop();
+  }
+
+  // inner circle: size from amplitude, colour from spectral centroid
+  let innerCircleSize = map(amplitude, 0, 255, circleRadius / 5, circleRadius);
+  let colorVal        = map(centroidFreq, 0, 22050, 0, 255);
+  fill(colorVal, 255, 255);
+  ellipse(0, 0, innerCircleSize * 2);
+
+  // restore RGB for rest of sketch
+  colorMode(RGB, 255);
+  pop();
 }
 
 // ----------------- CLASSES -----------------
@@ -173,17 +231,16 @@ class BridgeArea {
   }
 }
 
-// 🔹 UPDATED: GuyArea now takes an amplitude value
+// Guy controlled by amplitude
 class GuyArea {
   constructor(maskImg) {
     this.mask = maskImg;
-    this.basePixelSize = 6;     // starting size
-    this.pixelsPerFrame = 120;  // base speed
+    this.basePixelSize   = 6;    // starting size
+    this.pixelsPerFrame  = 120;  // base speed
   }
 
   // ampLevel is 0–1 from draw()
   drawPixels(ampLevel) {
-    // make pixel size + speed respond to sound
     let pixelSize = this.basePixelSize + ampLevel * 16;     // 6 → ~22
     let count     = this.pixelsPerFrame + ampLevel * 300;   // faster when loud
 
