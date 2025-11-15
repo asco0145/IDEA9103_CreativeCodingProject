@@ -6,7 +6,7 @@ function preload(){
 
 baseImg = loadImage("assets/scream.jpeg")
 
-guyMask = loadImage("assets/guy.png")
+guyMask = loadImage("assets/bwguy.png")
 
 skyMask = loadImage("assets/sky.png")
 
@@ -37,6 +37,9 @@ hillsMask.resize(width, height); //Trying to resize mask
 waterMask.resize(width, height);
 bridgeMask.resize(width, height);
 
+skyMask.resize(width, height);
+guyMask.resize(width, height);
+
 //image(baseImg, 0, 0);
 
 }
@@ -50,11 +53,42 @@ hills.drawPoints();
 water.drawPoints();
 bridge.drawPoints();
 
+sky.drawStrokes();
+
+
+//draw the pixelated guy last (so he sits on top)
+
+guy.drawPixels();
 }
 
 class SkyArea {
+  constructor(maskImg){
+    this.mask = maskImg;
 
+  }
+drawStrokes() {
+  for (let y = 0; y < height; y += 6) { //loops through the y axis of the canvas in steps of 6 pixels
+
+    let offset = sin(radians(frameCount * 2 + y * 3)) * 10; // horizontal left right movement
+
+    for (let x = 0; x < width; x += 12) { //each iteration draws one short stroke, 10 pixels wide, along the row
+         // check if pixel belongs to sky (based on mask brightness)
+        let m = this.mask.get(x, y);
+        let bright = (m[0] + m[1] + m[2]) / 3;
+
+        if (bright > 40) {  // only draw strokes where mask is bright (sky area)
+      let c = baseImg.get(x, y); //use colours from base image
+      stroke(c[0], c[1], c[2], 200);
+      strokeWeight(3); // make each line 3 pixels thick
+
+      // wave movement per pixel
+      let yShift = sin((x * 0.5) + (frameCount * 0.005)) * 3; //vertical wave motion
+      line(x + offset, y + yShift, x + 10 + offset, y + yShift); // horizontal line
+    }
+  }}}
 }
+
+  
 
 class WaterArea {
 
@@ -182,44 +216,67 @@ point(x, y);
 
 class BridgeArea {
   constructor(maskImg) {
+    // stores the black & white mask for the bridge
     this.mask = maskImg;
   }
 
   drawPoints() {
+    // each frame, randomly place small dots within the bridge area
     for (let i = 0; i < 250; i++) {
+
+      // pick a random position
       let x = random(width);
       let y = random(height);
 
-      // Safety check: make sure we don't go out of bounds
-      x = constrain(int(x), 0, width - 1);
-      y = constrain(int(y), 0, height - 1);
-
-      // Get mask pixel
-      let m = this.mask.get(x, y);
-
-      // Safety check: skip if mask.get() returns undefined
-      if (!m) continue;
-
-      // Average brightness of the mask pixel
+      // check brightness in the bridge mask at that position
+      let m = this.mask.get(int(x), int(y));
       let bright = (m[0] + m[1] + m[2]) / 3;
 
-      // Include most of the bridge (low threshold)
-      if (bright < 20) continue;
+      // only draw on white parts of the mask (the bridge)
+      if (bright < 120) continue;
 
-      // Get color from base image
-      let c = baseImg.get(x, y);
+      // grab the corresponding color from the original painting
+      let c = baseImg.get(int(x), int(y));
 
-      // Map brightness to dot size
-      let size = map((c[0] + c[1] + c[2]) / 3, 0, 255, 2, 6);
+      // map color brightness to dot size (dark = small, light = big)
+      let size = map((c[0] + c[1] + c[2]) / 3, 0, 255, 2, 5);
 
-      // Draw the dot
+      // draw the colored dot with some transparency
       strokeWeight(size);
-      stroke(c[0], c[1], c[2], 180);
+      stroke(c[0], c[1], c[2], 170);
       point(x, y);
     }
   }
 }
 
-class GuyArea {
 
+class GuyArea {
+constructor(maskImg) {
+    this.mask = maskImg;
+    this.pixelSize = 6;       // try 6–10 to see it clearly first
+    this.pixelsPerFrame = 100; // how fast he appears
+  }
+
+  drawPixels() {
+    for (let i = 0; i < this.pixelsPerFrame; i++) {
+      // pick a random position snapped to the pixel grid
+      let x = floor(random(width / this.pixelSize)) * this.pixelSize;
+      let y = floor(random(height / this.pixelSize)) * this.pixelSize;
+
+      // look up the mask at that position
+      let m = this.mask.get(x, y);
+      let bright = (m[0] + m[1] + m[2]) / 3;
+
+      // only draw where the mask is WHITE (inside the guy)
+      if (bright < 100) continue;
+
+      // sample colour from the base image
+      let c = baseImg.get(x, y);
+
+      noStroke();
+      // alpha controls softness of fade-in
+      fill(c[0], c[1], c[2], 120);
+      rect(x, y, this.pixelSize, this.pixelSize);
+    }
+  }
 }
