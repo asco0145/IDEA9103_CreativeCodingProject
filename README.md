@@ -23,6 +23,8 @@ This approach makes my contribution distinct from my group members, whose compon
 #### **Inspirations**
 My inspiration came from interactive digital art installations where viewer proximity or gestures influence the artwork’s behavior. I was particularly inspired by works from Refik Anadol, who uses real-time data and motion to create evolving digital canvases. The idea of the artwork reacting to a human presence influenced my decision to make The Scream reactive to both mouse movement and key input.
 
+![Refik Anadol's Work, Inspo](https://www.economist.com/cdn-cgi/image/width=1424,quality=80,format=auto/content-assets/images/20240224_CUP002.jpg)
+
 #### **Technical Explanation**
 Technically, my code modifies two animation systems:
 
