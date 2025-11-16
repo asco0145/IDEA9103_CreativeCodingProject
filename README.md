@@ -24,4 +24,12 @@ This approach makes my contribution distinct from my group members, whose compon
 My inspiration came from interactive digital art installations where viewer proximity or gestures influence the artwork’s behavior. I was particularly inspired by works from Refik Anadol, who uses real-time data and motion to create evolving digital canvases. The idea of the artwork reacting to a human presence influenced my decision to make The Scream reactive to both mouse movement and key input.
 
 #### **Technical Explanation**
+Technically, my code modifies two animation systems:
 
+- **Sky Area:**
+The SkyArea class uses sinusoidal wave motion for the sky’s brushstrokes. I introduced an interactive variable, skySpeed, which the user can change by pressing the up or down arrow keys. This value directly scales the speed of the sine wave’s oscillation, making the sky flow faster or slower.
+
+- **Guy Area:**
+In the GuyArea class, I used a hover detection system based on the figure’s mask. When the mouse cursor passes over a bright pixel in the mask, the scale value grows (using lerp()) toward a larger size. This creates a smooth grow/shrink animation.
+
+Together, these elements create a piece that feels alive and responsive, aligning the animation with the emotional essence of Munch’s painting.
