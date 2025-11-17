@@ -17,9 +17,9 @@ Similarly from Quiz 8, I was inspired by Refik Anadol's Machine Hallucinations s
 
 The code draws heavily on 
 
-[](https://thecodingtrain.com/challenges/24-perlin-noise-flow-field)
+[]("https://thecodingtrain.com/challenges/24-perlin-noise-flow-field")
 
-[](https://www.youtube.com/watch?v=1-QXuR-XX_s)
+[]("https://www.youtube.com/watch?v=1-QXuR-XX_s")
 
 
 # Technical explanation
