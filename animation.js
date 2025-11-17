@@ -1,47 +1,92 @@
+let svg = document.getElementById("basesvg");
+
 let baseImg, skyMask, waterMask, hillsMask, bridgeMask, guyMask;
 
 let sky, water, hills, bridge, guy;
 
+let numSegments = 50;
+let segments = [];
+
+
 function preload(){
 
 baseImg = loadImage("assets/scream.jpeg")
-guy = loadImage("assets/guy.png")
+guyMask = loadImage("assets/man.png")
 skyMask = loadImage("assets/sky.png")
-water = loadImage("assets/waterDots.png")
-bridge = loadImage("assets/bridge.png")
+waterMask = loadImage("assets/waterDots.png")
 
-sky = new SkyArea(skyMask);
-guy = new GuyArea(guyMask);
+sky = new WaveArea(skyMask);
+water = new WaveArea(waterMask);
+
 
 }
 
 function setup() {
 
 createCanvas(500, 600);
+angleMode(DEGREES);
 
 baseImg.resize(width,height);
 skyMask.resize(width, height);
-bridge.resize(width,height);
-water.resize(width,height);
-guy.resize(width,height);
+waterMask.resize(width,height);
+guyMask.resize(width,height);
 
+
+let segmentWidth = baseImg.width / numSegments;
+let segmentHeight = baseImg.height / numSegments;
+
+for (let segYPos=0; segYPos<baseImg.height; segYPos+=segmentHeight) {
+    //this is looping over the height
+    for (let segXPos=0; segXPos<baseImg.width; segXPos+=segmentWidth) {
+      //this loops over width
+      //This will create a segment for each x and y position
+      let segmentColour = baseImg.get(segXPos + segmentWidth / 2, segYPos + segmentHeight / 2);
+      let segment = new ImageSegment(segXPos,segYPos,segmentWidth,segmentHeight, segmentColour);
+      segments.push(segment);
+    }
+  }
 
 }
 
 function draw() {
-
-image(baseImg,0,0);
-image(water,0,0);
-
-image(bridge, 0, 0); //draw bridge 
-
-sky.drawStrokes();
-
-image(guy,0,0);
-
+   let t = millis() / 1000;
+   if (t<3){
+   for (const segment of segments) {
+    segment.drawSegment();
+  }
+}
+if (t>=3 && t<5){
+  image(baseImg, 0, 0);
 }
 
-class SkyArea {
+if (t>=5 && t<10){
+  water.drawStrokes();
+  sky.drawStrokes();
+  image(guyMask,0,0);
+}
+
+if(t>=10)
+{
+
+  //background("FFFFFF");
+
+  translate(width / 2, width / 2);
+  rotate(frameCount * 6);
+  let translateX = sin(frameCount) * width / 8;
+  let translateY = cos(frameCount) * height / 4; 
+  
+  // Move the origin position again using translateX and translateY
+  translate(translateX, translateY); 
+  
+  image(guyMask,0,-40);
+  image(guyMask,0,0);
+
+
+}
+}
+
+
+class WaveArea {
   constructor(maskImg){
     this.mask = maskImg;
 
@@ -49,7 +94,7 @@ class SkyArea {
 drawStrokes() {
   for (let y = 0; y < height; y += 6) { //loops through the y axis of the canvas in steps of 6 pixels
 
-    let offset = sin(radians(frameCount * 2 + y * 3)) * 10; // horizontal left right movement
+    let offset = sin((frameCount * 2 + y * 3)) * 10; // horizontal left right movement
 
     for (let x = 0; x < width; x += 12) { //each iteration draws one short stroke, 10 pixels wide, along the row
          // check if pixel belongs to sky (based on mask brightness)
@@ -68,47 +113,24 @@ drawStrokes() {
   }}}
 }
 
-class WaterArea {
 
-constructor(maskImg){this.mask = maskImg;}
 
-drawPoints(){
+class ImageSegment {
+  constructor(srcImgSegXPosInPrm,srcImgSegYPosInPrm,srcImgSegWidthInPrm,srcImgSegHeightInPrm, srcImgSegColourInPrm) {
+    //these parameters are used to set the internal properties of an instance of the segment
+    //These parameters are named as imageSource as they are derived from the image we are using
+    this.srcImgSegXPos = srcImgSegXPosInPrm;
+    this.srcImgSegYPos = srcImgSegYPosInPrm;
+    this.srcImgSegWidth = srcImgSegWidthInPrm;
+    this.srcImgSegHeight = srcImgSegHeightInPrm;
+    this.srcImgSegColour = srcImgSegColourInPrm;
+  }
 
-for (let i = 0; i < 250; i++){
+  drawSegment() {
 
-let x = random(width);
-
-let y = random(height);
-
-//Black and White Mask
-
-let m = this.mask.get(int(x), int(y));
-
-let bright = (m[0] + m[1] + m[2]) /3;
-
-if (bright < 100) continue;
-
-//Chooses color for the painting
-
-let c = baseImg.get(int(x), int(y));
-
-let size = map((c[0] + c[1] + c[2])/3, 0, 255, 2, 6) //size depends on color
-
-//Dot details
-
-strokeWeight(size);
-
-stroke(c[0], c[1], c[2], 180);
-
-point(x, y);
+    stroke(0);
+    fill(this.srcImgSegColour);
+    rect(this.srcImgSegXPos,this.srcImgSegYPos,this.srcImgSegWidth,this.srcImgSegHeight);
+  }
 
 }
-
-}
-
-}
-
-
-
-
-
