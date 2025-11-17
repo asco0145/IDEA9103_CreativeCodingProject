@@ -1,12 +1,13 @@
 let svg = document.getElementById("basesvg");
 
 let baseImg, skyMask, waterMask, hillsMask, bridgeMask, guyMask;
-
 let sky, water, hills, bridge, guy;
 
 let numSegments = 50;
 let segments = [];
 
+let imgDrwPrps = {aspect: 0, width: 0, height: 0, xOffset: 0, yOffset: 0};
+let canvasAspectRatio = 0;
 
 function preload(){
 
@@ -25,6 +26,7 @@ function setup() {
 
 createCanvas(500, 600);
 angleMode(DEGREES);
+imgDrwPrps.aspect = baseImg.width / baseImg.height;
 
 baseImg.resize(width,height);
 skyMask.resize(width, height);
@@ -46,6 +48,39 @@ for (let segYPos=0; segYPos<baseImg.height; segYPos+=segmentHeight) {
     }
   }
 
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  calculateImageDrawProps();
+}
+
+function calculateImageDrawProps() {
+  //Calculate the aspect ratio of the canvas
+  canvasAspectRatio = width / height;
+  //If the image is wider than the canvas
+  if (imgDrwPrps.aspect > canvasAspectRatio) {
+    //then we will draw the image to the width of the canvas
+    imgDrwPrps.width = width;
+    //and calculate the height based on the aspect ratio
+    imgDrwPrps.height = width / imgDrwPrps.aspect;
+    imgDrwPrps.yOffset = (height - imgDrwPrps.height) / 2;
+    imgDrwPrps.xOffset = 0;
+  } else if (imgDrwPrps.aspect < canvasAspectRatio) {
+    //Otherwise, we will draw the image to the height of the canvas
+    imgDrwPrps.height = height;
+    //and calculate the width based on the aspect ratio
+    imgDrwPrps.width = height * imgDrwPrps.aspect;
+    imgDrwPrps.xOffset = (width - imgDrwPrps.width) / 2;
+    imgDrwPrps.yOffset = 0;
+  }
+  else if (imgDrwPrps.aspect == canvasAspectRatio) {
+    //If the aspect ratios are the same then we can draw the image to the canvas size
+    imgDrwPrps.width = width;
+    imgDrwPrps.height = height;
+    imgDrwPrps.xOffset = 0;
+    imgDrwPrps.yOffset = 0;
+  }
 }
 
 function draw() {
@@ -134,3 +169,5 @@ class ImageSegment {
   }
 
 }
+
+
