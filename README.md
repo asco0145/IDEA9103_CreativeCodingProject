@@ -1,5 +1,5 @@
 # IDEA9103_CreativeCodingProject
-This is the individual task.
+This file explains the approach to the individual task, the technical aspects, experience guide, inspirations and intent behind the final artowrk.
 
 ## Introduction
 For our group task, we chose The Scream by Edvard Munch. The painting’s raw emotional intensity and its iconic, distorted landscape immediately stood out to us as the perfect work to reinterpret through code. Its swirling sky, vibrating colours, and sense of psychological tension made it an exciting challenge: how could we translate that same emotional weight into something interactive, animated, and digital? We were especially curious to see how we could use generative techniques to transform the original into a new visual experience.
@@ -32,9 +32,16 @@ For the wavy, shifting background, I wanted to express a feeling of instability,
 
 When the guy begins to spiral, the movement creates a repeated, echoing pattern that almost resembles a distorted mirror. This was intentional. The spiral becomes a visual metaphor for confronting your own reflection during a moment of emotional overwhelm.
 
-While playing around with the graphics, I noticed that the pattern also reminded me of Junji Ito’s Uzumaki, where spirals represent psychological descent and one’s inner turmoil. Using the figure itself to generate the pattern felt symbolic: the person becomes both the cause and the victim of their spiralling thoughts, echoing the idea of voices in the head folding inward.
+While playing around with the graphics, I noticed that the pattern also reminded me of Junji Ito’s Uzumaki, where spirals represent psychological descent and one’s inner turmoil. 
+<img src="assets/uzumaki.jpeg" alt="Uzumaki - Junji Ito" width="140" height="300">
+
+
+
+Using the figure itself to generate the pattern felt symbolic: the person becomes both the cause and the victim of their spiralling thoughts, echoing the idea of voices in the head folding inward.
 
 ## References
+
+
 
 ## AI acknowledgment
 I have used AI to polish the language used in this readme file.
