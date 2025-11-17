@@ -1,152 +1,266 @@
-let img;
-let skyRegion, waterRegion, guyRegion;
+let baseImg, skyMask, waterMask, hillsMask, bridgeMask, guyMask;
 
-function preload() {
-  img = loadImage('assets/base.png');   // your image
+let sky, water, hills, bridge, guy;
+
+function preload(){
+
+baseImg = loadImage("assets/scream.jpeg")
+guyMask = loadImage("assets/bwguy.png")
+skyMask = loadImage("assets/sky.png")
+waterMask = loadImage("assets/bwWater.png")
+hillsMask = loadImage("assets/hills.png")
+bridgeMask = loadImage("assets/bwBridge.png")
+
+sky = new SkyArea(skyMask);
+water = new WaterArea(waterMask);
+hills = new HillsArea(hillsMask);
+bridge = new BridgeArea(bridgeMask);
+guy = new GuyArea(guyMask);
+
 }
 
 function setup() {
-  createCanvas(img.width, img.height);
 
-  // Define simple regions (adjust if needed)
-  skyRegion = { x: 0, y: 0, w: width, h: height * 0.33 };
-  waterRegion = { x: 0, y: height * 0.33, w: width, h: height * 0.33 };
-  guyRegion = { x: width * 0.35, y: height * 0.45, w: width * 0.30, h: height * 0.40 };
+createCanvas(baseImg.width, baseImg.height);
 
-  imageMode(CORNER);
+hillsMask.resize(width, height);
+waterMask.resize(width, height);
+bridgeMask.resize(width, height);
+skyMask.resize(width, height);
+guyMask.resize(width, height);
+
+//image(baseImg, 0, 0);
+
 }
 
 function draw() {
-  background(0);
-  image(img, 0, 0);
 
-  let t = millis() / 1000;
+//background(220);
 
-  // ---------------------------
-  // 1. START — CALM VIEW (0–3s)
-  // ---------------------------
-  if (t < 3) return;
+hills.drawPoints();
 
-  // ---------------------------
-  // 2. WATER RIPPLES (3–7s)
-  // ---------------------------
-  if (t >= 3 && t < 7) {
-    drawWaterRipples(map(t, 3, 7, 0, 1));
-  }
+water.drawPoints();
+bridge.drawPoints();
 
-  // ---------------------------
-  // 3. SKY HUE SHIFT (7–10s)
-  // ---------------------------
-  if (t >= 7 && t < 10) {
-    drawSkyHueShift(map(t, 7, 10, 0, 1));
-  }
+sky.drawStrokes();
 
-  // ---------------------------
-  // 4. GLITCH GUY (10–12s)
-  // ---------------------------
-  if (t >= 10 && t < 12) {
-    drawGuyGlitch(map(t, 10, 12, 0, 1));
-  }
 
-  // ---------------------------
-  // 5. SYNC MOTION (12–15s)
-  // EVERYTHING MOVES TOGETHER
-  // ---------------------------
-  if (t >= 12 && t < 15) {
-    let phase = map(t, 12, 15, 0, 1);
-    drawWaterRipples(1);
-    drawSkyHueShift(1);
-    drawGuyGlitch(1 - abs(sin(frameCount * 0.1))); // pulsating glitch
-  }
+//draw the pixelated guy last (so he sits on top)
 
-  // ---------------------------
-  // 6. SETTLE BACK TO STILLNESS (15s+)
-  // ---------------------------
-  if (t >= 15) {
-    let easeOut = exp(-(t - 15)); // exponential decay of motion
-
-    drawWaterRipples(easeOut);
-    drawSkyHueShift(easeOut);
-    drawGuyGlitch(easeOut * 0.3);
-  }
+guy.drawPixels();
 }
 
-// -------------------------------------------------------------
-// WATER RIPPLE EFFECT
-// -------------------------------------------------------------
-function drawWaterRipples(strength) {
-  let r = waterRegion;
-  let waveAmp = 10 * strength;
-  let waveFreq = 0.02;
+class SkyArea {
+  constructor(maskImg){
+    this.mask = maskImg;
 
-  for (let y = r.y; y < r.y + r.h; y++) {
-    let offset = sin((frameCount + y) * waveFreq) * waveAmp;
-    copy(img, r.x, y, r.w, 1, r.x + offset, y, r.w, 1);
   }
+drawStrokes() {
+  for (let y = 0; y < height; y += 6) { //loops through the y axis of the canvas in steps of 6 pixels
+
+    let offset = sin(radians(frameCount * 2 + y * 3)) * 10; // horizontal left right movement
+
+    for (let x = 0; x < width; x += 12) { //each iteration draws one short stroke, 10 pixels wide, along the row
+         // check if pixel belongs to sky (based on mask brightness)
+        let m = this.mask.get(x, y);
+        let bright = (m[0] + m[1] + m[2]) / 3;
+
+        if (bright > 40) {  // only draw strokes where mask is bright (sky area)
+      let c = baseImg.get(x, y); //use colours from base image
+      stroke(c[0], c[1], c[2], 200);
+      strokeWeight(3); // make each line 3 pixels thick
+
+      // wave movement per pixel
+      let yShift = sin((x * 0.5) + (frameCount * 0.005)) * 3; //vertical wave motion
+      line(x + offset, y + yShift, x + 10 + offset, y + yShift); // horizontal line
+    }
+  }}}
 }
 
-// -------------------------------------------------------------
-// SKY HUE SHIFT EFFECT
-// -------------------------------------------------------------
-function drawSkyHueShift(strength) {
-  let r = skyRegion;
-  loadPixels();
-  img.loadPixels();
+class WaterArea {
 
-  for (let y = r.y; y < r.y + r.h; y++) {
-    for (let x = r.x; x < r.x + r.w; x++) {
-      let i = 4 * (y * width + x);
+constructor(maskImg){this.mask = maskImg;}
 
-      let hShift = sin(frameCount * 0.02 + y * 0.01) * 30 * strength;
+drawPoints(){
 
-      // Convert RGB → HSB, shift hue, convert back
-      let c = color(img.pixels[i], img.pixels[i+1], img.pixels[i+2]);
-      colorMode(HSB);
-      let h = (hue(c) + hShift) % 360;
-      let s = saturation(c);
-      let b = brightness(c);
-      let newC = color(h, s, b);
-      colorMode(RGB);
+for (let i = 0; i < 250; i++){
 
-      pixels[i]   = red(newC);
-      pixels[i+1] = green(newC);
-      pixels[i+2] = blue(newC);
-      pixels[i+3] = 255;
+let x = random(width);
+
+let y = random(height);
+
+//Black and White Mask
+
+let m = this.mask.get(int(x), int(y));
+
+let bright = (m[0] + m[1] + m[2]) /3;
+
+if (bright < 100) continue;
+
+//Chooses color for the painting
+
+let c = baseImg.get(int(x), int(y));
+
+let size = map((c[0] + c[1] + c[2])/3, 0, 255, 2, 6) //size depends on color
+
+//Dot details
+
+strokeWeight(size);
+
+stroke(c[0], c[1], c[2], 180);
+
+point(x, y);
+
+}
+
+}
+
+}
+
+class HillsArea {
+
+constructor(maskImg){this.mask = maskImg;}
+
+/*drawLines() {
+
+//Draws 5 lines
+
+for (let i = 0; i < 5; i++){
+
+let x1 = random(width);
+
+let y1 = random(height);
+
+let x2 = random(width);
+
+let y2 = random(height);
+
+//Check Point 1
+
+let p1 = this.mask.get(int(x1), int(y1));
+
+let b1 = (p1[0] + p1[1] + p1[2]) /3; //greyscale
+
+//Check Point 2
+
+let p2 = this.mask.get(int(x2), int(y2));
+
+let b2 = (p2[0] + p2[1] + p2[2]) /3; //greyscale
+
+if(b1 < 200 || b2 < 200) continue; //avoid drawing in the black
+
+//Choses color for the painting
+
+let c = baseImg.get(int(x1), int(y1));
+
+strokeWeight(4);
+
+stroke(c[0], c[1], c[2], 180);
+
+line(x1, y1, x2, y2);
+
+}
+
+}*/
+
+drawPoints(){
+
+for (let i = 0; i < 250; i++){
+
+let x = random(width);
+
+let y = random(height);
+
+//Black and White Mask
+
+let m = this.mask.get(int(x), int(y));
+
+let bright = (m[0] + m[1] + m[2]) /3;
+
+if (bright < 100) continue;
+
+//Choses color for the painting
+
+let c = baseImg.get(int(x), int(y));
+
+let size = map((c[0] + c[1] + c[2])/3, 0, 255, 2, 6) //size depends on color
+
+//Dot details
+
+strokeWeight(size);
+
+stroke(c[0], c[1], c[2], 180);
+
+point(x, y);
+
+}
+
+}
+
+}
+
+class BridgeArea {
+  constructor(maskImg) {
+    // stores the black & white mask for the bridge
+    this.mask = maskImg;
+  }
+
+  drawPoints() {
+    // each frame, randomly place small dots within the bridge area
+    for (let i = 0; i < 250; i++) {
+
+      // pick a random position
+      let x = random(width);
+      let y = random(height);
+
+      // check brightness in the bridge mask at that position
+      let m = this.mask.get(int(x), int(y));
+      let bright = (m[0] + m[1] + m[2]) / 3;
+
+      // only draw on white parts of the mask (the bridge)
+      if (bright < 120) continue;
+
+      // grab the corresponding color from the original painting
+      let c = baseImg.get(int(x), int(y));
+
+      // map color brightness to dot size (dark = small, light = big)
+      let size = map((c[0] + c[1] + c[2]) / 3, 0, 255, 2, 5);
+
+      // draw the colored dot with some transparency
+      strokeWeight(size);
+      stroke(c[0], c[1], c[2], 170);
+      point(x, y);
     }
   }
-
-  updatePixels();
 }
 
-// -------------------------------------------------------------
-// GLITCH GUY EFFECT
-// -------------------------------------------------------------
-function drawGuyGlitch(strength) {
-  let r = guyRegion;
-
-  let glitchChance = 0.05 * strength;
-
-  if (random() < glitchChance) {
-    let sliceY = random(r.y, r.y + r.h);
-    let sliceH = random(5, 20);
-
-    copy(
-      img,
-      r.x, sliceY, r.w, sliceH,
-      r.x + random(-20, 20) * strength, sliceY,
-      r.w, sliceH
-    );
+class GuyArea {
+constructor(maskImg) {
+    this.mask = maskImg;
+    this.pixelSize = 6;       // try 6–10 to see it clearly first
+    this.pixelsPerFrame = 100; // how fast he appears
   }
 
-  // Pixelation
-  let pixelSize = map(strength, 0, 1, 1, 12);
+  drawPixels() {
+    for (let i = 0; i < this.pixelsPerFrame; i++) {
+      // pick a random position snapped to the pixel grid
+      let x = floor(random(width / this.pixelSize)) * this.pixelSize;
+      let y = floor(random(height / this.pixelSize)) * this.pixelSize;
 
-  for (let y = r.y; y < r.y + r.h; y += pixelSize) {
-    for (let x = r.x; x < r.x + r.w; x += pixelSize) {
-      let c = img.get(x, y);
+      // look up the mask at that position
+      let m = this.mask.get(x, y);
+      let bright = (m[0] + m[1] + m[2]) / 3;
+
+      // only draw where the mask is WHITE (inside the guy)
+      if (bright < 100) continue;
+
+      // sample colour from the base image
+      let c = baseImg.get(x, y);
+
       noStroke();
-      fill(c);
-      rect(x, y, pixelSize, pixelSize);
+      // alpha controls softness of fade-in
+      fill(c[0], c[1], c[2], 120);
+      rect(x, y, this.pixelSize, this.pixelSize);
     }
   }
 }
