@@ -32,10 +32,9 @@ For the wavy, shifting background, I wanted to express a feeling of **instabilit
 
 When the guy begins to spiral, the movement creates a repeated, echoing pattern that almost resembles a distorted mirror. This was intentional. The spiral becomes a visual metaphor for confronting your own reflection during a moment of emotional overwhelm.
 
-While playing around with the graphics, I noticed that the pattern also reminded me of Junji Ito’s Uzumaki, where spirals represent psychological descent and one’s inner turmoil. 
+While playing around with the graphics, I noticed that the pattern also reminded me of **Junji Ito - Uzumaki**, where spirals represent psychological descent and one’s inner turmoil. 
 
 <img src="assets/uzumaki.jpeg" alt="Uzumaki - Junji Ito" width="140" height="300">
-
 
 
 Using the figure itself to generate the pattern felt symbolic: the person becomes both the cause and the victim of their spiralling thoughts, echoing the idea of voices in the head folding inward.
