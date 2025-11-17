@@ -103,7 +103,7 @@ if (t>=5 && t<10){
 if(t>=10)
 {
 
-  //background("FFFFFF");
+
 
   translate(width / 2, width / 2);
   rotate(frameCount * 6);
