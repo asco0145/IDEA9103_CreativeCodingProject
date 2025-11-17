@@ -5,49 +5,40 @@ let sky, water, hills, bridge, guy;
 function preload(){
 
 baseImg = loadImage("assets/scream.jpeg")
-guyMask = loadImage("assets/bwguy.png")
+guy = loadImage("assets/guy.png")
 skyMask = loadImage("assets/sky.png")
-waterMask = loadImage("assets/bwWater.png")
-hillsMask = loadImage("assets/hills.png")
-bridgeMask = loadImage("assets/bwBridge.png")
+water = loadImage("assets/waterDots.png")
+bridge = loadImage("assets/bridge.png")
 
 sky = new SkyArea(skyMask);
-water = new WaterArea(waterMask);
-hills = new HillsArea(hillsMask);
-bridge = new BridgeArea(bridgeMask);
 guy = new GuyArea(guyMask);
 
 }
 
 function setup() {
 
-createCanvas(baseImg.width, baseImg.height);
+createCanvas(500, 600);
 
-hillsMask.resize(width, height);
-waterMask.resize(width, height);
-bridgeMask.resize(width, height);
+baseImg.resize(width,height);
 skyMask.resize(width, height);
-guyMask.resize(width, height);
+bridge.resize(width,height);
+water.resize(width,height);
+guy.resize(width,height);
 
-//image(baseImg, 0, 0);
 
 }
 
 function draw() {
 
-//background(220);
+image(baseImg,0,0);
+image(water,0,0);
 
-hills.drawPoints();
-
-water.drawPoints();
-bridge.drawPoints();
+image(bridge, 0, 0); //draw bridge 
 
 sky.drawStrokes();
 
+image(guy,0,0);
 
-//draw the pixelated guy last (so he sits on top)
-
-guy.drawPixels();
 }
 
 class SkyArea {
@@ -117,150 +108,7 @@ point(x, y);
 
 }
 
-class HillsArea {
 
-constructor(maskImg){this.mask = maskImg;}
 
-/*drawLines() {
 
-//Draws 5 lines
 
-for (let i = 0; i < 5; i++){
-
-let x1 = random(width);
-
-let y1 = random(height);
-
-let x2 = random(width);
-
-let y2 = random(height);
-
-//Check Point 1
-
-let p1 = this.mask.get(int(x1), int(y1));
-
-let b1 = (p1[0] + p1[1] + p1[2]) /3; //greyscale
-
-//Check Point 2
-
-let p2 = this.mask.get(int(x2), int(y2));
-
-let b2 = (p2[0] + p2[1] + p2[2]) /3; //greyscale
-
-if(b1 < 200 || b2 < 200) continue; //avoid drawing in the black
-
-//Choses color for the painting
-
-let c = baseImg.get(int(x1), int(y1));
-
-strokeWeight(4);
-
-stroke(c[0], c[1], c[2], 180);
-
-line(x1, y1, x2, y2);
-
-}
-
-}*/
-
-drawPoints(){
-
-for (let i = 0; i < 250; i++){
-
-let x = random(width);
-
-let y = random(height);
-
-//Black and White Mask
-
-let m = this.mask.get(int(x), int(y));
-
-let bright = (m[0] + m[1] + m[2]) /3;
-
-if (bright < 100) continue;
-
-//Choses color for the painting
-
-let c = baseImg.get(int(x), int(y));
-
-let size = map((c[0] + c[1] + c[2])/3, 0, 255, 2, 6) //size depends on color
-
-//Dot details
-
-strokeWeight(size);
-
-stroke(c[0], c[1], c[2], 180);
-
-point(x, y);
-
-}
-
-}
-
-}
-
-class BridgeArea {
-  constructor(maskImg) {
-    // stores the black & white mask for the bridge
-    this.mask = maskImg;
-  }
-
-  drawPoints() {
-    // each frame, randomly place small dots within the bridge area
-    for (let i = 0; i < 250; i++) {
-
-      // pick a random position
-      let x = random(width);
-      let y = random(height);
-
-      // check brightness in the bridge mask at that position
-      let m = this.mask.get(int(x), int(y));
-      let bright = (m[0] + m[1] + m[2]) / 3;
-
-      // only draw on white parts of the mask (the bridge)
-      if (bright < 120) continue;
-
-      // grab the corresponding color from the original painting
-      let c = baseImg.get(int(x), int(y));
-
-      // map color brightness to dot size (dark = small, light = big)
-      let size = map((c[0] + c[1] + c[2]) / 3, 0, 255, 2, 5);
-
-      // draw the colored dot with some transparency
-      strokeWeight(size);
-      stroke(c[0], c[1], c[2], 170);
-      point(x, y);
-    }
-  }
-}
-
-class GuyArea {
-constructor(maskImg) {
-    this.mask = maskImg;
-    this.pixelSize = 6;       // try 6–10 to see it clearly first
-    this.pixelsPerFrame = 100; // how fast he appears
-  }
-
-  drawPixels() {
-    for (let i = 0; i < this.pixelsPerFrame; i++) {
-      // pick a random position snapped to the pixel grid
-      let x = floor(random(width / this.pixelSize)) * this.pixelSize;
-      let y = floor(random(height / this.pixelSize)) * this.pixelSize;
-
-      // look up the mask at that position
-      let m = this.mask.get(x, y);
-      let bright = (m[0] + m[1] + m[2]) / 3;
-
-      // only draw where the mask is WHITE (inside the guy)
-      if (bright < 100) continue;
-
-      // sample colour from the base image
-      let c = baseImg.get(x, y);
-
-      noStroke();
-      // alpha controls softness of fade-in
-      fill(c[0], c[1], c[2], 120);
-      rect(x, y, this.pixelSize, this.pixelSize);
-    }
-  }
-}
