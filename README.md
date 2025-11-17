@@ -1,11 +1,14 @@
 # IDEA9103_CreativeCodingProject
-This file explains the approach to the individual task, the technical aspects, experience guide, inspirations and intent behind the final artowrk.
+This file explains the approach to both the group and individual tasks, the technical aspects, experience guide, inspirations and intent behind the final artwork.
 
 ## Introduction
 For our group task, we chose **The Scream by Edvard Munch**. The painting’s raw emotional intensity and its iconic, distorted landscape immediately stood out to us as the perfect work to reinterpret through code. Its swirling sky, vibrating colours, and sense of psychological tension made it an exciting challenge: how could we **translate that same emotional weight into something interactive**, animated, and digital? We were especially curious to see how we could use generative techniques to transform the original into a new visual experience.
 
 ## The technique I picked
 For my individual approach, I chose a **time-based animation**, using timers, triggers, and controlled events. I was curious about how movement could evoke the emotional atmosphere of the painting — whether motion could capture the same **unease, tension, and surreal quality** that Munch created through brushstrokes. By designing the animation to unfold over time, I aimed to guide the viewer through shifting emotional states, rather than presenting everything all at once.
+
+# Contribution to the group task
+My role in the group task focused on the water region, where I applied a pointillism-inspired dot technique to reinterpret the original texture and visual depth. Munch’s water is filled with a sweeping motion. Instead of recreating these strokes directly, I wanted to reinterpret that sense of movement through clusters of small dots. 
 
 ## Idea for the individual task
 My concept was inspired by the feelings the painting evokes: the sense of internal noise, the dreamlike distortion of the world, and the way everything feels like it’s collapsing inward before spiralling out of control. The painting has always reminded me of that moment **when reality blurs with emotion** — when the external world mirrors the chaos inside your mind. I wanted to express that experience through **gradual transitions, instability, and finally a spiralling motion** that reflects an inner psychological collapse.
