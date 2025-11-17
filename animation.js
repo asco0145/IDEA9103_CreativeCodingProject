@@ -1,39 +1,49 @@
-let svg = document.getElementById("basesvg");
-
+//defined variables to hold asset images
 let baseImg, skyMask, waterMask, hillsMask, bridgeMask, guyMask;
-let sky, water, hills, bridge, guy;
 
+//variables to store the object returned from classes
+let sky, water;
+
+//variable to divide canvas into segments.
 let numSegments = 50;
-let segments = [];
 
+//array to store the segments in an array
+let segments = []; 
+
+// array to hold snowflake objects
+let snowflakes = [];
+
+//to hold the draw properties of the image. For responsive design
 let imgDrwPrps = {aspect: 0, width: 0, height: 0, xOffset: 0, yOffset: 0};
 let canvasAspectRatio = 0;
 
+//to load images
 function preload(){
 
 baseImg = loadImage("assets/scream.jpeg")
 guyMask = loadImage("assets/man.png")
 skyMask = loadImage("assets/sky.png")
 waterMask = loadImage("assets/waterDots.png")
-
 sky = new WaveArea(skyMask);
 water = new WaveArea(waterMask);
-
-
 }
 
+//to setup tasks like creating the canvas and initialising variables
 function setup() {
-
 createCanvas(500, 600);
-angleMode(DEGREES);
+angleMode(DEGREES); 
+
+//to calculate the aspect ratio of the image
 imgDrwPrps.aspect = baseImg.width / baseImg.height;
 
+
+//resize images to fit frame
 baseImg.resize(width,height);
 skyMask.resize(width, height);
 waterMask.resize(width,height);
 guyMask.resize(width,height);
 
-
+//to calculate segment dimensions
 let segmentWidth = baseImg.width / numSegments;
 let segmentHeight = baseImg.height / numSegments;
 
@@ -48,8 +58,15 @@ for (let segYPos=0; segYPos<baseImg.height; segYPos+=segmentHeight) {
     }
   }
 
+   // Create snowflake objects
+  for (let i = 0; i < 300; i++) {
+    // Add a new snowflake object to the array
+    snowflakes.push(new Snowflake());
+  }
+
 }
 
+//makes frame responsive
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   calculateImageDrawProps();
@@ -83,28 +100,32 @@ function calculateImageDrawProps() {
   }
 }
 
+//to draw timed animation
 function draw() {
-   let t = millis() / 1000;
+   let t = millis() / 1000; //millis() tells how much time has passed since the sketch started running
+   
+   //start with pixelated canvas
    if (t<3){
    for (const segment of segments) {
     segment.drawSegment();
   }
 }
+
+//reveal image
 if (t>=3 && t<5){
   image(baseImg, 0, 0);
 }
 
+//start wave animation
 if (t>=5 && t<10){
   water.drawStrokes();
   sky.drawStrokes();
   image(guyMask,0,0);
 }
 
-if(t>=10)
+//start spiral animation
+if(t>=10 && t<17)
 {
-
-
-
   translate(width / 2, width / 2);
   rotate(frameCount * 6);
   let translateX = sin(frameCount) * width / 8;
@@ -113,14 +134,31 @@ if(t>=10)
   // Move the origin position again using translateX and translateY
   translate(translateX, translateY); 
   
+  //to set guy position
   image(guyMask,0,-40);
   image(guyMask,0,0);
 
+}
+//clear animation
+if(t>=17 && t<20){
+
+   background(0);
+}
+
+//snmowflake animation
+if(t>=20){
+  // Update and display each snowflake in the array
+  let currentTime = frameCount / 60;
+
+  for (let flake of snowflakes) {
+    // Update each snowflake position and display
+    flake.update(currentTime);
+    flake.display();
+  }
+}
 
 }
-}
-
-
+//class for the wave animation
 class WaveArea {
   constructor(maskImg){
     this.mask = maskImg;
@@ -149,7 +187,7 @@ drawStrokes() {
 }
 
 
-
+//class to segment images
 class ImageSegment {
   constructor(srcImgSegXPosInPrm,srcImgSegYPosInPrm,srcImgSegWidthInPrm,srcImgSegHeightInPrm, srcImgSegColourInPrm) {
     //these parameters are used to set the internal properties of an instance of the segment
@@ -164,10 +202,46 @@ class ImageSegment {
   drawSegment() {
 
     stroke(0);
-    fill(this.srcImgSegColour);
-    rect(this.srcImgSegXPos,this.srcImgSegYPos,this.srcImgSegWidth,this.srcImgSegHeight);
+    fill(this.srcImgSegColour); //to pick color for each segment
+    rect(this.srcImgSegXPos,this.srcImgSegYPos,this.srcImgSegWidth,this.srcImgSegHeight); //draw segment
   }
-
 }
 
 
+//class for snowflake effect
+class Snowflake {
+  constructor() {
+    this.posX = 0;
+    this.posY = random(-height, 0);
+    this.initialAngle = random(0, 360);
+    this.size = random(2, 5);
+    this.radius = sqrt(random(pow(width / 2, 2)));
+    this.color = color(random(200, 256), random(200, 256), random(200, 256));
+  }
+
+  update(time) {
+    // Define angular speed (degrees / second)
+    let angularSpeed = 35;
+
+    // Calculate the current angle
+    let angle = this.initialAngle + angularSpeed * time;
+
+    // x position follows a sine wave
+    this.posX = width / 2 + this.radius * sin(angle);
+
+    // Different size snowflakes fall at different y speeds
+    let ySpeed = 8 / this.size;
+    this.posY += ySpeed;
+
+    // When snowflake reaches the bottom, move it to the top
+    if (this.posY > height) {
+      this.posY = -50;
+    }
+  }
+
+  display() {
+    fill(this.color);
+    noStroke();
+    ellipse(this.posX, this.posY, this.size);
+  }
+}

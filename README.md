@@ -23,9 +23,11 @@ The animation unfolds over time in distinct phases:
 - 1–3 seconds: The painting appears in a pixelated, fractured state.
 - 3–5 seconds: The full image is revealed as the distortion fades.
 - 5–10 seconds: The background begins to shift in slow, undulating waves, introducing instability and panick.
-- 10+ seconds: Finally, the human begins to spiral out of control, creating an intense focal point.
+- 10-17 seconds: Finally, the human begins to spiral out of control, creating an intense focal point.
+- 17-20 seconds: Blank screen.
+- 20+ seconds: Snowflakes.
 
-Each stage builds upon the previous one, moving from clarity to distortion to complete psychological unraveling.
+Each stage builds upon the previous one, moving from clarity to distortion to complete psychological unraveling and eventually ends with a calm animation.
 
 ## Symbolism
 For the wavy, shifting background, I wanted to express a feeling of **instability, panic, and surreal disorientation** — as if the world itself is vibrating with anxiety. The gentle waves eventually intensify, reflecting the loss of grounding that the painting communicates so powerfully.
@@ -39,9 +41,10 @@ While playing around with the graphics, I noticed that the pattern also reminded
 
 Using the figure itself to generate the pattern felt symbolic: the person becomes both the cause and the victim of their spiralling thoughts, echoing the idea of voices in the head folding inward.
 
+At the end of the animation, the screen fades into a completely black space where soft snowflakes begin to fall. This final sequence acts as a visual exhale after the intensity of the spiralling motion. The snow represents a kind of emotional quietness: the cold clarity that follows an overwhelming moment. Where the rest of the animation is chaotic, fractured, and loud, the snowfall introduces stillness.
+
 ## References
-
-
+1. Bhatia, A. (2024). Snowflakes. [https://p5js.org/examples/classes-and-objects-snowflakes/](https://p5js.org/examples/classes-and-objects-snowflakes/)
 
 ## AI acknowledgment
-I have used AI to polish the language used in this readme file.
+I have used AI to polish the language used in this README file.
