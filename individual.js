@@ -21,7 +21,7 @@ function draw() {
   background(255);
 
   // mouse position controls Perlin parameters 
-  //map() re-maps a number from one range to another
+  //map() re-maps a number from one range to another from p5js.org 
   let speed = map(mouseX, 0, width, 0.005, 0.03); // horizontal movement = animation speed 
   let magnitude = map(mouseY, 0, height, 5, 30); // vertical movement = wave magnitude 
   // // top to bottom reveal 
@@ -39,7 +39,7 @@ function draw() {
   for (let y = 0; y < revealHeight; y++) { 
     // mouse moves change all offsets for more interaction 
     let offset = noise(frameCount * speed, y * 0.04 + mouseX * 0.01) * magnitude - magnitude / 2; // noise() is from p5js.org/reference/#/p5/noise
-    copy(screamImg, 0, y, w, 1, offset, y, w, 1); } // copy() to shift the pixel rows horizontally
+    copy(screamImg, 0, y, w, 1, offset, y, w, 1); } // copy() to shift the pixel rows horizontally from p5js.org
 
  
  
