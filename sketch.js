@@ -5,25 +5,16 @@ let sky, water, hills, bridge, guy;
 function preload(){
 
 baseImg = loadImage("assets/scream.jpeg")
-
 guyMask = loadImage("assets/bwguy.png")
-
 skyMask = loadImage("assets/sky.png")
-
 waterMask = loadImage("assets/bwWater.png")
-
 hillsMask = loadImage("assets/hills.png")
-
 bridgeMask = loadImage("assets/bwBridge.png")
 
 sky = new SkyArea(skyMask);
-
 water = new WaterArea(waterMask);
-
 hills = new HillsArea(hillsMask);
-
 bridge = new BridgeArea(bridgeMask);
-
 guy = new GuyArea(guyMask);
 
 }
@@ -32,11 +23,9 @@ function setup() {
 
 createCanvas(baseImg.width, baseImg.height);
 
-hillsMask.resize(width, height); //Trying to resize mask
-
+hillsMask.resize(width, height);
 waterMask.resize(width, height);
 bridgeMask.resize(width, height);
-
 skyMask.resize(width, height);
 guyMask.resize(width, height);
 
@@ -88,8 +77,6 @@ drawStrokes() {
   }}}
 }
 
-  
-
 class WaterArea {
 
 constructor(maskImg){this.mask = maskImg;}
@@ -129,8 +116,6 @@ point(x, y);
 }
 
 }
-
-//Alex
 
 class HillsArea {
 
@@ -248,7 +233,6 @@ class BridgeArea {
     }
   }
 }
-
 
 class GuyArea {
 constructor(maskImg) {
